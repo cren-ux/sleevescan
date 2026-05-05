@@ -71,16 +71,16 @@ export function printQrCode(record) {
             color: #0b111a;
           }
           .sheet {
-            width: 0.78in;
-            padding: 0.04in;
+            width: 1.18in;
+            padding: 0.06in;
             text-align: center;
             break-inside: avoid;
           }
           img {
             display: block;
-            width: 0.5in;
-            height: 0.5in;
-            margin: 0 auto 0.03in;
+            width: 1in;
+            height: 1in;
+            margin: 0 auto 0.04in;
           }
           h1 {
             margin: 0;
