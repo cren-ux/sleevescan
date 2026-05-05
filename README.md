@@ -72,11 +72,12 @@ Open `admin.html` to create a card-backed QR code from catalog data.
 4. Create the QR code.
 
 This keeps seller entry simple while still grounding the card identity in a
-structured catalog record. The photo upload in the admin flow is a visual
-matching placeholder for the MVP: true PriceCharting-style image recognition
-requires a backend image matching service or ML model. For cross-device shopper
-scanning, seller-created records should be saved to the shared Google Sheet
-backend, not only to this browser's `localStorage`.
+structured catalog record. The admin scan panel opens the camera and presents
+live catalog matches for confirmation. True PriceCharting-style image
+recognition still requires a backend image matching service or ML model; the
+frontend scan UI is ready for that service when it is added. For cross-device
+shopper scanning, seller-created records should be saved to the shared Google
+Sheet backend, not only to this browser's `localStorage`.
 
 ## Free Google Sheets backend
 

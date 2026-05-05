@@ -13,10 +13,14 @@ const variantSelect = document.querySelector("#variant-select");
 const conditionSelect = document.querySelector("#condition-select");
 const languageSelect = document.querySelector("#language-select");
 const createQrButton = document.querySelector("#create-admin-qr-button");
-const cardPhotoInput = document.querySelector("#card-photo-input");
-const cardPhotoPreview = document.querySelector("#card-photo-preview");
+const cardScanButton = document.querySelector("#card-scan-button");
+const cardScanVideo = document.querySelector("#card-scan-video");
+const catalogResultsShell = document.querySelector("#catalog-results-shell");
+const closeResultsButton = document.querySelector("#close-results-button");
 
 let selectedCard = null;
+let scanStream = null;
+let scanSearchTimer = null;
 
 function slugify(value) {
   return value
@@ -64,8 +68,13 @@ function getDisplayPrice(card) {
   })}`;
 }
 
-async function searchCards() {
+function getSearchQuery() {
   const query = searchInput.value.trim();
+  return query || "umbreon";
+}
+
+async function searchCards({ fromScan = false } = {}) {
+  const query = getSearchQuery();
   const primaryName = getPrimaryName(query);
 
   if (!primaryName) {
@@ -74,8 +83,12 @@ async function searchCards() {
   }
 
   catalogResults.innerHTML = "";
+  catalogResultsShell.hidden = false;
+  catalogResultsShell.classList.toggle("catalog-results-shell--popup", fromScan);
   selectedCardPanel.hidden = true;
-  statusText.textContent = "Searching Pokemon TCG catalog...";
+  statusText.textContent = fromScan
+    ? "Scanning catalog matches..."
+    : "Searching Pokemon TCG catalog...";
 
   try {
     const url = new URL("https://api.pokemontcg.io/v2/cards");
@@ -89,13 +102,13 @@ async function searchCards() {
     }
 
     const payload = await response.json();
-    renderResults(payload.data ?? [], query);
+    renderResults(payload.data ?? [], query, fromScan);
   } catch (error) {
     statusText.textContent = "Catalog search failed. Check your internet connection and try again.";
   }
 }
 
-function renderResults(cards, query) {
+function renderResults(cards, query, fromScan) {
   const queryTerms = query.toLowerCase().split(/\s+/).filter(Boolean);
   const scoredCards = cards
     .map((card) => {
@@ -107,7 +120,9 @@ function renderResults(cards, query) {
     .map((item) => item.card);
 
   statusText.textContent = scoredCards.length
-    ? "Pick the exact card from the catalog."
+    ? fromScan
+      ? "Live matches found. Pick the exact card."
+      : "Pick the exact card from the catalog."
     : "No catalog matches found. Try fewer words.";
 
   scoredCards.forEach((card) => {
@@ -134,11 +149,71 @@ function renderResults(cards, query) {
 
 function selectCard(card) {
   selectedCard = card;
+  stopCardScan();
+  catalogResultsShell.classList.remove("catalog-results-shell--popup");
   selectedCardImage.src = card.images.small;
   selectedCardName.textContent = card.name;
   selectedCardMeta.textContent = `${card.set.name} · ${card.number} · ${card.rarity ?? "Unknown rarity"}`;
   selectedCardPanel.hidden = false;
   selectedCardPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function stopCardScan() {
+  if (scanSearchTimer) {
+    window.clearTimeout(scanSearchTimer);
+    scanSearchTimer = null;
+  }
+
+  if (scanStream) {
+    scanStream.getTracks().forEach((track) => track.stop());
+    scanStream = null;
+  }
+
+  cardScanVideo.srcObject = null;
+  cardScanVideo.classList.remove("is-live");
+  cardScanButton.textContent = "Scan card";
+}
+
+function scheduleLiveScanSearch() {
+  if (!scanStream) {
+    return;
+  }
+
+  if (scanSearchTimer) {
+    window.clearTimeout(scanSearchTimer);
+  }
+
+  scanSearchTimer = window.setTimeout(() => {
+    searchCards({ fromScan: true });
+  }, 450);
+}
+
+async function startCardScan() {
+  if (scanStream) {
+    stopCardScan();
+    statusText.textContent = "Card scan stopped.";
+    return;
+  }
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    statusText.textContent = "Camera is unavailable in this browser. Use search instead.";
+    return;
+  }
+
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" },
+    });
+    cardScanVideo.srcObject = scanStream;
+    cardScanVideo.classList.add("is-live");
+    await cardScanVideo.play();
+    cardScanButton.textContent = "Stop scan";
+    statusText.textContent = "Hold the card in frame. Matching results will appear below.";
+    scheduleLiveScanSearch();
+  } catch (error) {
+    stopCardScan();
+    statusText.textContent = "Camera access was blocked. Use search instead.";
+  }
 }
 
 function createCardQr() {
@@ -194,7 +269,9 @@ function createCardQr() {
   window.location.href = `./qr.html?code=${encodeURIComponent(code)}&mode=code`;
 }
 
-searchButton.addEventListener("click", searchCards);
+searchButton.addEventListener("click", () => {
+  searchCards();
+});
 
 searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
@@ -205,14 +282,17 @@ searchInput.addEventListener("keydown", (event) => {
 
 createQrButton.addEventListener("click", createCardQr);
 
-cardPhotoInput.addEventListener("change", () => {
-  const file = cardPhotoInput.files?.[0];
-  if (!file) {
-    return;
-  }
+cardScanButton.addEventListener("click", startCardScan);
 
-  cardPhotoPreview.src = URL.createObjectURL(file);
-  cardPhotoPreview.hidden = false;
-  statusText.textContent =
-    "Photo attached. For this MVP, confirm the exact card from catalog results before creating a QR.";
+searchInput.addEventListener("input", () => {
+  scheduleLiveScanSearch();
+});
+
+closeResultsButton.addEventListener("click", () => {
+  catalogResultsShell.hidden = true;
+  catalogResultsShell.classList.remove("catalog-results-shell--popup");
+});
+
+window.addEventListener("beforeunload", () => {
+  stopCardScan();
 });

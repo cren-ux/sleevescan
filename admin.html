@@ -50,21 +50,32 @@
             </button>
           </div>
 
-          <label class="admin-photo">
-            <span class="admin-photo__icon">▣</span>
-            <span>
-              <strong>Add card photo</strong>
-              <small>Use camera or upload for visual matching review</small>
-            </span>
-            <input id="card-photo-input" type="file" accept="image/*" capture="environment" />
-          </label>
-          <img id="card-photo-preview" class="admin-photo-preview" alt="Selected card preview" hidden />
+          <section class="card-scan-panel">
+            <video
+              id="card-scan-video"
+              class="card-scan-video"
+              playsinline
+              muted
+            ></video>
+            <div class="card-scan-overlay" aria-hidden="true">
+              <span></span>
+            </div>
+            <button id="card-scan-button" class="card-scan-button" type="button">
+              Scan card
+            </button>
+          </section>
 
           <p id="admin-status" class="admin-status">
             Search by card name, set, number, or variant.
           </p>
 
-          <div id="catalog-results" class="catalog-results"></div>
+          <div id="catalog-results-shell" class="catalog-results-shell" hidden>
+            <div class="catalog-results-header">
+              <strong>Matching results</strong>
+              <button id="close-results-button" type="button">Close</button>
+            </div>
+            <div id="catalog-results" class="catalog-results"></div>
+          </div>
         </section>
 
         <section id="selected-card-panel" class="admin-panel selected-card-panel" hidden>
