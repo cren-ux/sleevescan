@@ -976,7 +976,7 @@ input:focus-visible {
 }
 
 .hero-card__header {
-  align-items: center;
+  align-items: flex-start;
   gap: 18px;
 }
 
@@ -984,6 +984,12 @@ input:focus-visible {
   flex: 0 0 auto;
   font-size: clamp(3.8rem, 16vw, 5.2rem);
   line-height: 1;
+  margin-top: 0.08em;
+}
+
+.hero-card__identity {
+  min-width: 0;
+  text-align: left;
 }
 
 .hero-card__identity h1 {
@@ -1019,6 +1025,7 @@ input:focus-visible {
 .hero-card__meta {
   margin: 12px 0 0;
   font-size: 1.1rem;
+  text-align: left;
 }
 
 .price-hero {
@@ -1026,6 +1033,7 @@ input:focus-visible {
   padding: 32px;
   border-radius: 24px;
   background: rgba(16, 22, 34, 0.92);
+  text-align: left;
 }
 
 .price-hero__label {
