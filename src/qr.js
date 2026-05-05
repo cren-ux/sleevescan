@@ -60,7 +60,15 @@ function renderQrCode({ save = false } = {}) {
     payload,
   };
 
-  activeRecord = save ? saveQrCode(record) : record;
+  activeRecord = record;
+  if (save) {
+    try {
+      activeRecord = saveQrCode(record);
+    } catch (error) {
+      console.warn("QR code generated but could not be saved:", error);
+    }
+  }
+
   qrImage.src = qrUrl;
   qrPreviewLabel.textContent = mode === "link" ? "Direct card link" : normalized;
   qrPayload.textContent = payload;

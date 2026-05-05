@@ -492,6 +492,11 @@ input:focus-visible {
   font-weight: 800;
 }
 
+.qr-print-button--wide {
+  width: 100%;
+  margin-top: 14px;
+}
+
 .demo-list {
   display: grid;
   gap: 12px;
