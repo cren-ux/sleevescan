@@ -60,40 +60,44 @@ export function printQrCode(record) {
       <head>
         <title>Print ${code}</title>
         <style>
+          @page {
+            size: letter;
+            margin: 0.25in;
+          }
           * { box-sizing: border-box; }
           body {
             margin: 0;
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
             font-family: Arial, sans-serif;
             color: #0b111a;
           }
           .sheet {
-            width: 3.5in;
-            padding: 0.22in;
-            border: 1px solid #ccd3df;
+            width: 0.78in;
+            padding: 0.04in;
             text-align: center;
+            break-inside: avoid;
           }
           img {
             display: block;
-            width: 2.6in;
-            height: 2.6in;
-            margin: 0 auto 0.16in;
+            width: 0.5in;
+            height: 0.5in;
+            margin: 0 auto 0.03in;
           }
           h1 {
             margin: 0;
-            font-size: 18px;
+            font-size: 5px;
+            line-height: 1.1;
+            overflow-wrap: anywhere;
           }
           p {
-            margin: 0.08in 0 0;
+            display: none;
+            margin: 0.02in 0 0;
             color: #505a6b;
-            font-size: 11px;
+            font-size: 4px;
+            line-height: 1.1;
             overflow-wrap: anywhere;
           }
           @media print {
-            body { min-height: auto; }
-            .sheet { border: 0; }
+            body { width: 8in; }
           }
         </style>
       </head>
