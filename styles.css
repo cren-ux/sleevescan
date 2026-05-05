@@ -775,10 +775,11 @@ input:focus-visible {
 
 .card-scan-panel {
   position: relative;
-  margin-top: 12px;
-  min-height: 230px;
+  width: min(100%, 320px);
+  aspect-ratio: 0.72;
+  margin: 12px auto 0;
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 30px;
   border: 1px solid rgba(89, 216, 126, 0.22);
   background:
     linear-gradient(180deg, rgba(18, 24, 39, 0.72), rgba(18, 24, 39, 0.94)),
@@ -803,7 +804,7 @@ input:focus-visible {
 .card-scan-overlay {
   position: absolute;
   inset: 0;
-  display: grid;
+  display: none;
   place-items: center;
   pointer-events: none;
 }
