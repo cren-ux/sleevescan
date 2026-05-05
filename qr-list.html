@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SleeveScan Saved QR Codes</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="mobile-frame">
+        <header class="topbar">
+          <a class="brand brand--link" href="./index.html">
+            <div class="brand__mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M15.8 4.7l2.4 7.1 7.1 2.4-7.1 2.4-2.4 7.1-2.4-7.1-7.1-2.4 7.1-2.4 2.4-7.1z" />
+                <path d="M24.6 5.6v4.8" />
+                <path d="M22.2 8h4.8" />
+                <circle cx="7.8" cy="24.4" r="2.5" />
+              </svg>
+            </div>
+            <span class="brand__name">SleeveScan</span>
+          </a>
+          <a class="topbar-link" href="./qr.html">Create</a>
+        </header>
+
+        <section class="qr-page-hero">
+          <h1>Saved QR Codes</h1>
+          <p>Reprint saved sleeve codes, sorted alphabetically.</p>
+        </section>
+
+        <section class="saved-qr-panel">
+          <div id="saved-qr-list" class="saved-qr-list"></div>
+          <p id="saved-qr-empty" class="saved-qr-empty" hidden>
+            No saved QR codes yet. Create one first.
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./src/qrList.js"></script>
+  </body>
+</html>

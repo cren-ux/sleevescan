@@ -58,6 +58,10 @@ The generated QR image uses the free `api.qrserver.com` image endpoint, so it
 needs internet access while generating the QR. The encoded card code still maps
 to your Google Sheet row or local fallback data.
 
+Generated QR codes are saved in the browser with `localStorage`. Open
+`qr-list.html` to view saved codes alphabetically, edit them, or print them
+again. Saved codes live on the device/browser that created them.
+
 ## Free Google Sheets backend
 
 This project can use a free Google Sheet as a temporary pricing database for

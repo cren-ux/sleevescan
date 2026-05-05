@@ -21,7 +21,10 @@
             </div>
             <span class="brand__name">SleeveScan</span>
           </a>
-          <a class="topbar-link" href="./index.html">Scan</a>
+          <div class="topbar__actions">
+            <a class="topbar-link" href="./qr-list.html">Saved</a>
+            <a class="topbar-link" href="./index.html">Scan</a>
+          </div>
         </header>
 
         <section class="qr-page-hero">
@@ -63,9 +66,12 @@
             <button id="generate-qr-button" class="lookup-button" type="button">
               Generate
             </button>
+            <button id="print-qr-button" class="qr-print-button" type="button" hidden>
+              Print QR Code
+            </button>
           </div>
 
-          <div class="qr-preview">
+          <div id="qr-preview" class="qr-preview" hidden>
             <div class="qr-preview__image-wrap">
               <img id="qr-image" alt="Generated sleeve QR code" />
             </div>
