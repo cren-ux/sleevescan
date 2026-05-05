@@ -151,18 +151,11 @@ input:focus-visible {
   background: rgba(89, 216, 126, 0.18);
 }
 
-.qr-nav-button__grid {
-  width: 18px;
-  height: 18px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-}
-
-.qr-nav-button__grid span {
-  border-radius: 3px;
-  background: var(--green);
-  box-shadow: 0 0 12px rgba(89, 216, 126, 0.34);
+.qr-nav-button__icon {
+  width: 22px;
+  height: 22px;
+  fill: var(--green);
+  filter: drop-shadow(0 0 8px rgba(89, 216, 126, 0.34));
 }
 
 .topbar-link {
