@@ -171,6 +171,32 @@ input:focus-visible {
   font-weight: 700;
 }
 
+.app-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 34px;
+  padding: 8px 0 0;
+}
+
+.app-footer a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: rgba(223, 247, 229, 0.76);
+  background: rgba(89, 216, 126, 0.08);
+  border: 1px solid rgba(89, 216, 126, 0.14);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.app-footer a:hover {
+  color: #dff7e5;
+  background: rgba(89, 216, 126, 0.13);
+}
+
 .live-indicator {
   margin: 0;
   position: relative;
