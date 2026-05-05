@@ -31,42 +31,116 @@
         <section class="qr-page-hero">
           <h1>Create Qr Code</h1>
           <p>
-            Generate sleeve codes for in-app scanning or direct links for a
-            phone camera demo.
+            Search or scan a card, choose the exact match, then generate a
+            print-ready sleeve code.
           </p>
         </section>
 
         <section class="qr-lab qr-lab--page">
           <div class="section-heading section-heading--compact">
-            <h2>QR generator</h2>
-            <span>Print-ready</span>
+            <h2>Find card</h2>
+            <span>Catalog match</span>
           </div>
 
-          <div class="qr-lab__controls">
+          <div class="admin-search">
             <label class="scan-input">
-              <span class="sr-only">QR sleeve code</span>
+              <span class="sr-only">Search card catalog</span>
               <input
-                id="qr-code-input"
-                type="text"
-                placeholder="raw:charizard-base-4"
+                id="card-search-input"
+                type="search"
+                placeholder="umbreon delta species reverse holo"
                 autocomplete="off"
               />
             </label>
-
-            <div class="qr-mode" aria-label="QR code type">
-              <label>
-                <input type="radio" name="qr-mode" value="code" checked />
-                <span>App scan</span>
-              </label>
-              <label>
-                <input type="radio" name="qr-mode" value="link" />
-                <span>Direct link</span>
-              </label>
-            </div>
-
-            <button id="generate-qr-button" class="lookup-button" type="button">
-              Generate
+            <button id="card-search-button" class="lookup-button" type="button">
+              Search
             </button>
+          </div>
+
+          <section class="card-scan-panel">
+            <video
+              id="card-scan-video"
+              class="card-scan-video"
+              playsinline
+              muted
+            ></video>
+            <button id="card-scan-button" class="card-scan-button" type="button">
+              Scan card
+            </button>
+          </section>
+
+          <p id="qr-status" class="admin-status">
+            Search by name, set, number, or variant. Results with card images
+            will appear below.
+          </p>
+
+          <div id="catalog-results-shell" class="catalog-results-shell" hidden>
+            <div class="catalog-results-header">
+              <strong>Matching results</strong>
+              <button id="close-results-button" type="button">Close</button>
+            </div>
+            <div id="catalog-results" class="catalog-results"></div>
+          </div>
+        </section>
+
+        <section id="selected-card-panel" class="qr-lab qr-lab--page selected-card-panel" hidden>
+          <div class="section-heading section-heading--compact">
+            <h2>Confirm card</h2>
+            <span>Seller record</span>
+          </div>
+
+          <article class="selected-card">
+            <img id="selected-card-image" alt="Selected Pokemon card" />
+            <div>
+              <h3 id="selected-card-name">Card name</h3>
+              <p id="selected-card-meta">Set · Number · Rarity</p>
+            </div>
+          </article>
+
+          <div class="admin-fields">
+            <label>
+              <span>Variant</span>
+              <select id="variant-select">
+                <option>Normal</option>
+                <option>Holo</option>
+                <option selected>Reverse Holo</option>
+                <option>1st Edition</option>
+                <option>Promo</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Condition / grade</span>
+              <select id="condition-select">
+                <option selected>Raw NM</option>
+                <option>Raw LP</option>
+                <option>Raw MP</option>
+                <option>Raw HP</option>
+                <option>PSA 10</option>
+                <option>PSA 9</option>
+                <option>BGS 9.5</option>
+                <option>CGC 10</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Language</span>
+              <select id="language-select">
+                <option selected>English</option>
+                <option>Japanese</option>
+              </select>
+            </label>
+          </div>
+
+          <button id="generate-qr-button" class="qr-print-button qr-print-button--wide" type="button">
+            Generate
+          </button>
+        </section>
+
+        <section id="qr-output-panel" class="qr-lab qr-lab--page" hidden>
+          <div class="section-heading section-heading--compact">
+            <h2>QR code</h2>
+            <span>Ready to print</span>
           </div>
 
           <div id="qr-preview" class="qr-preview" hidden>
@@ -77,7 +151,7 @@
               <strong id="qr-preview-label">raw:charizard-base-4</strong>
               <p id="qr-payload">raw:charizard-base-4</p>
               <a id="qr-download-link" class="qr-download" href="#" target="_blank" rel="noreferrer">
-                Open QR
+                Open QR Code
               </a>
             </div>
           </div>
