@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SleeveScan Seller Admin</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="mobile-frame admin-frame">
+        <header class="topbar">
+          <a class="brand brand--link" href="./index.html">
+            <div class="brand__mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M15.8 4.7l2.4 7.1 7.1 2.4-7.1 2.4-2.4 7.1-2.4-7.1-7.1-2.4 7.1-2.4 2.4-7.1z" />
+                <path d="M24.6 5.6v4.8" />
+                <path d="M22.2 8h4.8" />
+                <circle cx="7.8" cy="24.4" r="2.5" />
+              </svg>
+            </div>
+            <span class="brand__name">SleeveScan</span>
+          </a>
+          <a class="topbar-link" href="./index.html">Scan</a>
+        </header>
+
+        <section class="qr-page-hero">
+          <h1>Seller Admin</h1>
+          <p>Search the catalog, confirm the exact card, then create a sleeve QR code.</p>
+        </section>
+
+        <section class="admin-panel">
+          <div class="section-heading section-heading--compact">
+            <h2>Find card</h2>
+            <span>Catalog first</span>
+          </div>
+
+          <div class="admin-search">
+            <label class="scan-input">
+              <span class="sr-only">Search card catalog</span>
+              <input
+                id="admin-search-input"
+                type="search"
+                placeholder="umbreon delta species reverse holo"
+                autocomplete="off"
+              />
+            </label>
+            <button id="admin-search-button" class="lookup-button" type="button">
+              Search
+            </button>
+          </div>
+
+          <label class="admin-photo">
+            <span class="admin-photo__icon">▣</span>
+            <span>
+              <strong>Add card photo</strong>
+              <small>Use camera or upload for visual matching review</small>
+            </span>
+            <input id="card-photo-input" type="file" accept="image/*" capture="environment" />
+          </label>
+          <img id="card-photo-preview" class="admin-photo-preview" alt="Selected card preview" hidden />
+
+          <p id="admin-status" class="admin-status">
+            Search by card name, set, number, or variant.
+          </p>
+
+          <div id="catalog-results" class="catalog-results"></div>
+        </section>
+
+        <section id="selected-card-panel" class="admin-panel selected-card-panel" hidden>
+          <div class="section-heading section-heading--compact">
+            <h2>Confirm identity</h2>
+            <span>Seller record</span>
+          </div>
+
+          <article class="selected-card">
+            <img id="selected-card-image" alt="Selected Pokemon card" />
+            <div>
+              <h3 id="selected-card-name">Card name</h3>
+              <p id="selected-card-meta">Set · Number · Rarity</p>
+            </div>
+          </article>
+
+          <div class="admin-fields">
+            <label>
+              <span>Variant</span>
+              <select id="variant-select">
+                <option>Normal</option>
+                <option>Holo</option>
+                <option selected>Reverse Holo</option>
+                <option>1st Edition</option>
+                <option>Promo</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Condition / grade</span>
+              <select id="condition-select">
+                <option selected>Raw NM</option>
+                <option>Raw LP</option>
+                <option>Raw MP</option>
+                <option>Raw HP</option>
+                <option>PSA 10</option>
+                <option>PSA 9</option>
+                <option>BGS 9.5</option>
+                <option>CGC 10</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Language</span>
+              <select id="language-select">
+                <option selected>English</option>
+                <option>Japanese</option>
+              </select>
+            </label>
+          </div>
+
+          <button id="create-admin-qr-button" class="qr-print-button qr-print-button--wide" type="button">
+            Create QR Code
+          </button>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./src/admin.js"></script>
+  </body>
+</html>

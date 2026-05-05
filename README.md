@@ -62,6 +62,22 @@ Generated QR codes are saved in the browser with `localStorage`. Open
 `qr-list.html` to view saved codes alphabetically, edit them, or print them
 again. Saved codes live on the device/browser that created them.
 
+## Seller admin flow
+
+Open `admin.html` to create a card-backed QR code from catalog data.
+
+1. Search a simple phrase such as `umbreon delta species reverse holo`.
+2. Pick the exact card from Pokemon TCG API catalog results.
+3. Choose variant, condition or grade, and language.
+4. Create the QR code.
+
+This keeps seller entry simple while still grounding the card identity in a
+structured catalog record. The photo upload in the admin flow is a visual
+matching placeholder for the MVP: true PriceCharting-style image recognition
+requires a backend image matching service or ML model. For cross-device shopper
+scanning, seller-created records should be saved to the shared Google Sheet
+backend, not only to this browser's `localStorage`.
+
 ## Free Google Sheets backend
 
 This project can use a free Google Sheet as a temporary pricing database for

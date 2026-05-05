@@ -1,5 +1,6 @@
 import { GOOGLE_SHEETS_API_URL } from "./appConfig.js";
 import { getCardByCode } from "./cardData.js";
+import { getCreatedCardByCode } from "./createdCards.js";
 
 function withFallbackDefaults(card, fallback) {
   const fallbackCard = fallback ?? {};
@@ -77,6 +78,12 @@ export async function getPricingCardByCode(code) {
     }
   } catch (error) {
     console.warn("Using local demo pricing data:", error);
+  }
+
+  const createdCard = getCreatedCardByCode(normalized);
+
+  if (createdCard) {
+    return withFallbackDefaults(createdCard, fallback);
   }
 
   return fallback;

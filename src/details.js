@@ -74,6 +74,7 @@ function getDisplayIcon(icon) {
     WATER: "🌊",
     MOON: "🌙",
     ELECTRIC: "⚡",
+    CARD: "◈",
   };
 
   return icons[icon] ?? icon ?? "?";
