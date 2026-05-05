@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SleeveScan</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="mobile-frame">
+        <header class="topbar">
+          <div class="brand">
+            <div class="brand__mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M15.8 4.7l2.4 7.1 7.1 2.4-7.1 2.4-2.4 7.1-2.4-7.1-7.1-2.4 7.1-2.4 2.4-7.1z" />
+                <path d="M24.6 5.6v4.8" />
+                <path d="M22.2 8h4.8" />
+                <circle cx="7.8" cy="24.4" r="2.5" />
+              </svg>
+            </div>
+            <span class="brand__name">SleeveScan</span>
+          </div>
+          <div class="topbar__actions">
+            <p class="live-indicator">Live market</p>
+            <a class="qr-nav-button" href="./qr.html" aria-label="Create Qr Code">
+              <span class="qr-nav-button__grid" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </a>
+          </div>
+        </header>
+
+        <section class="hero">
+          <h1>
+            Real prices.
+            <span>One scan away.</span>
+          </h1>
+        </section>
+
+        <section class="scanner-panel">
+          <video
+            id="scanner-video"
+            class="scanner-video"
+            playsinline
+            muted
+          ></video>
+          <div class="scanner-glow" aria-hidden="true"></div>
+          <button id="camera-button" class="scanner-cta" type="button">
+            <span class="scanner-cta__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false">
+                <path d="M14 18v-3.2c0-2.1 1.7-3.8 3.8-3.8H21" />
+                <path d="M27 11h3.2c2.1 0 3.8 1.7 3.8 3.8V18" />
+                <path d="M34 30v3.2c0 2.1-1.7 3.8-3.8 3.8H27" />
+                <path d="M21 37h-3.2c-2.1 0-3.8-1.7-3.8-3.8V30" />
+                <path d="M18 24h12" />
+              </svg>
+            </span>
+            <strong>Tap to scan</strong>
+            <span>Point at sleeve QR code</span>
+          </button>
+          <p id="scanner-status" class="scanner-status">
+            Open the camera on a phone to scan a QR sticker, or use a demo code
+            below.
+          </p>
+          <span id="scanner-badge" class="scanner-badge">Camera idle</span>
+        </section>
+
+        <div class="source-pills" aria-label="Source coverage">
+          <span>eBay</span>
+          <span>Goldin</span>
+          <span>PriceCharting</span>
+          <span>Fanatics</span>
+          <span>PSA</span>
+        </div>
+
+        <section class="demo-section">
+          <div class="demo-section__header">
+            <p>Try a demo card</p>
+          </div>
+
+          <div class="scan-input-row">
+            <label class="scan-input">
+              <span class="sr-only">Sleeve QR code</span>
+              <input
+                id="code-input"
+                type="text"
+                placeholder="Try psa:117401741 or raw:charizard-base-4"
+                autocomplete="off"
+              />
+            </label>
+            <button id="lookup-button" class="lookup-button" type="button">
+              Lookup
+            </button>
+          </div>
+
+          <div class="demo-list">
+            <a class="demo-card" href="./details.html?card=raw%3Acharizard-base-4">
+              <div class="demo-card__info">
+                <span class="demo-card__icon">🔥</span>
+                <div>
+                  <strong>Charizard</strong>
+                  <p>Base Set (1999) · PSA 10</p>
+                </div>
+              </div>
+              <span class="demo-card__price">$18,450</span>
+            </a>
+
+            <a class="demo-card" href="./details.html?card=psa%3A134400879">
+              <div class="demo-card__info">
+                <span class="demo-card__icon">⚡</span>
+                <div>
+                  <strong>Vaporeon EX</strong>
+                  <p>Generations · PSA 9</p>
+                </div>
+              </div>
+              <span class="demo-card__price">$66</span>
+            </a>
+
+            <a class="demo-card" href="./details.html?card=psa%3A117401741">
+              <div class="demo-card__info">
+                <span class="demo-card__icon">🌊</span>
+                <div>
+                  <strong>Umbreon V</strong>
+                  <p>Eevee Heroes · PSA 10</p>
+                </div>
+              </div>
+              <span class="demo-card__price">$1,240</span>
+            </a>
+          </div>
+        </section>
+
+      </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

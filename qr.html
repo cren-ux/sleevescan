@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SleeveScan QR Generator</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="mobile-frame">
+        <header class="topbar">
+          <a class="brand brand--link" href="./index.html">
+            <div class="brand__mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M15.8 4.7l2.4 7.1 7.1 2.4-7.1 2.4-2.4 7.1-2.4-7.1-7.1-2.4 7.1-2.4 2.4-7.1z" />
+                <path d="M24.6 5.6v4.8" />
+                <path d="M22.2 8h4.8" />
+                <circle cx="7.8" cy="24.4" r="2.5" />
+              </svg>
+            </div>
+            <span class="brand__name">SleeveScan</span>
+          </a>
+          <a class="topbar-link" href="./index.html">Scan</a>
+        </header>
+
+        <section class="qr-page-hero">
+          <h1>Create Qr Code</h1>
+          <p>
+            Generate sleeve codes for in-app scanning or direct links for a
+            phone camera demo.
+          </p>
+        </section>
+
+        <section class="qr-lab qr-lab--page">
+          <div class="section-heading section-heading--compact">
+            <h2>QR generator</h2>
+            <span>Print-ready</span>
+          </div>
+
+          <div class="qr-lab__controls">
+            <label class="scan-input">
+              <span class="sr-only">QR sleeve code</span>
+              <input
+                id="qr-code-input"
+                type="text"
+                placeholder="raw:charizard-base-4"
+                autocomplete="off"
+              />
+            </label>
+
+            <div class="qr-mode" aria-label="QR code type">
+              <label>
+                <input type="radio" name="qr-mode" value="code" checked />
+                <span>App scan</span>
+              </label>
+              <label>
+                <input type="radio" name="qr-mode" value="link" />
+                <span>Direct link</span>
+              </label>
+            </div>
+
+            <button id="generate-qr-button" class="lookup-button" type="button">
+              Generate
+            </button>
+          </div>
+
+          <div class="qr-preview">
+            <div class="qr-preview__image-wrap">
+              <img id="qr-image" alt="Generated sleeve QR code" />
+            </div>
+            <div class="qr-preview__meta">
+              <strong id="qr-preview-label">raw:charizard-base-4</strong>
+              <p id="qr-payload">raw:charizard-base-4</p>
+              <a id="qr-download-link" class="qr-download" href="#" target="_blank" rel="noreferrer">
+                Open QR
+              </a>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./src/qr.js"></script>
+  </body>
+</html>

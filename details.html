@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SleeveScan Card Details</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="details-page">
+    <main class="app-shell">
+      <section class="mobile-frame details-frame">
+        <header class="topbar topbar--details">
+          <a class="brand brand--link" href="./index.html">
+            <div class="brand__mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M15.8 4.7l2.4 7.1 7.1 2.4-7.1 2.4-2.4 7.1-2.4-7.1-7.1-2.4 7.1-2.4 2.4-7.1z" />
+                <path d="M24.6 5.6v4.8" />
+                <path d="M22.2 8h4.8" />
+                <circle cx="7.8" cy="24.4" r="2.5" />
+              </svg>
+            </div>
+            <span class="brand__name">SleeveScan</span>
+          </a>
+          <p class="live-indicator">Live market</p>
+        </header>
+
+        <section class="hero-card">
+          <div class="hero-card__header">
+            <div class="hero-card__icon" id="detail-icon">🔥</div>
+            <div class="hero-card__identity">
+              <div class="hero-card__title-row">
+                <h1 id="detail-name">Charizard</h1>
+                <span id="detail-grade" class="grade-pill">PSA 10</span>
+              </div>
+              <p id="detail-meta" class="hero-card__meta">
+                Base Set (1999) · #4/102 · Holo Rare
+              </p>
+            </div>
+          </div>
+
+          <div class="price-hero">
+            <p class="price-hero__label">Current Price</p>
+            <strong id="detail-price" class="price-hero__value">$18,450</strong>
+            <span id="detail-trend24h" class="trend-pill">↗ +3.2% 24h</span>
+            <p id="detail-range" class="price-hero__note">
+              Live estimate based on recent comps across eBay, Goldin,
+              PriceCharting, Fanatics & PSA.
+            </p>
+          </div>
+
+          <div class="stat-cards">
+            <article class="stat-card">
+              <p>30d Low</p>
+              <strong id="detail-low">$16,200</strong>
+            </article>
+            <article class="stat-card">
+              <p>30d High</p>
+              <strong id="detail-high">$21,000</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="trend-card">
+          <div class="section-heading section-heading--large">
+            <h2>30-day trend</h2>
+            <span>avg of all sources</span>
+          </div>
+          <div class="trend-chart">
+            <svg id="trend-svg" viewBox="0 0 680 260" preserveAspectRatio="none" aria-hidden="true">
+              <path id="trend-line" class="trend-line" d=""></path>
+            </svg>
+            <div id="trend-labels" class="trend-labels"></div>
+          </div>
+        </section>
+
+        <section class="recent-card">
+          <div class="section-heading section-heading--large">
+            <h2>Recent comps</h2>
+          </div>
+          <div id="detail-comps" class="detail-comps"></div>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./src/details.js"></script>
+  </body>
+</html>
