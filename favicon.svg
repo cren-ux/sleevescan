@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="sleevescan-green" x1="32" y1="0" x2="32" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#43db89" />
+      <stop offset="1" stop-color="#28b36a" />
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#sleevescan-green)" />
+  <g fill="none" stroke="#06120d" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M31.6 9.4 36.4 23.6 50.6 28.4 36.4 33.2 31.6 47.4 26.8 33.2 12.6 28.4 26.8 23.6 31.6 9.4Z" />
+    <path d="M49.2 11.2v9.6" />
+    <path d="M44.4 16h9.6" />
+    <circle cx="15.6" cy="48.8" r="5" />
+  </g>
+</svg>
