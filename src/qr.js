@@ -29,6 +29,23 @@ let selectedCard = null;
 let activeRecord = null;
 let scanStream = null;
 let scanSearchTimer = null;
+let ocrPromise = null;
+let isRecognizingCard = false;
+
+const OCR_SCRIPT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+const OCR_STOPWORDS = new Set([
+  "basic",
+  "stage",
+  "evolves",
+  "from",
+  "hp",
+  "weakness",
+  "resistance",
+  "retreat",
+  "pokemon",
+  "trainer",
+  "energy",
+]);
 
 function slugify(value) {
   return String(value)
@@ -50,6 +67,31 @@ function extractSleeveCode(value) {
 
 function getPrimaryName(query) {
   return query.trim().split(/\s+/)[0] ?? "";
+}
+
+function getLikelyCardName(text) {
+  const lines = text
+    .split(/\n+/)
+    .map((line) =>
+      line
+        .replace(/[^a-zA-Z' -]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+    )
+    .filter(Boolean);
+
+  return (
+    lines.find((line) => {
+      const lower = line.toLowerCase();
+      const firstWord = lower.split(/\s+/)[0];
+      return (
+        line.length >= 4 &&
+        line.length <= 34 &&
+        !OCR_STOPWORDS.has(firstWord) &&
+        !lower.includes("evolves from")
+      );
+    }) ?? ""
+  );
 }
 
 function buildPricingQuery(card, variant, condition, language) {
@@ -120,6 +162,56 @@ function clearCardSelection() {
   resetGeneratedQr();
 }
 
+function loadOcr() {
+  if (window.Tesseract) {
+    return Promise.resolve(window.Tesseract);
+  }
+
+  if (ocrPromise) {
+    return ocrPromise;
+  }
+
+  ocrPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = OCR_SCRIPT_URL;
+    script.async = true;
+    script.onload = () => {
+      if (window.Tesseract) {
+        resolve(window.Tesseract);
+      } else {
+        reject(new Error("OCR library did not load."));
+      }
+    };
+    script.onerror = () => {
+      ocrPromise = null;
+      reject(new Error("OCR library failed to load."));
+    };
+    document.head.appendChild(script);
+  });
+
+  return ocrPromise;
+}
+
+function captureCardFrame() {
+  const width = cardScanVideo.videoWidth;
+  const height = cardScanVideo.videoHeight;
+
+  if (!width || !height) {
+    return "";
+  }
+
+  const canvas = document.createElement("canvas");
+  const targetWidth = 900;
+  const scale = Math.min(targetWidth / width, 1);
+  canvas.width = Math.round(width * scale);
+  canvas.height = Math.round(height * scale);
+
+  const context = canvas.getContext("2d");
+  context.filter = "contrast(1.35) saturate(0.85)";
+  context.drawImage(cardScanVideo, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/png");
+}
+
 async function searchCards({ fromScan = false } = {}) {
   const query = getSearchQuery();
   const primaryName = getPrimaryName(query);
@@ -130,7 +222,7 @@ async function searchCards({ fromScan = false } = {}) {
     clearCardSelection();
     statusText.textContent =
       fromScan
-        ? "Type a card name above first, then scan to pull matching card results."
+        ? "Scan the card again with the name area larger in frame."
         : "Type a card name to search.";
     return;
   }
@@ -158,6 +250,50 @@ async function searchCards({ fromScan = false } = {}) {
     renderResults(payload.data ?? [], query, fromScan);
   } catch (error) {
     statusText.textContent = "Catalog search failed. Check your internet connection and try again.";
+  }
+}
+
+async function recognizeCardFromCamera() {
+  if (isRecognizingCard) {
+    return;
+  }
+
+  isRecognizingCard = true;
+  statusText.textContent = "Reading the card name from the camera...";
+
+  try {
+    const image = captureCardFrame();
+
+    if (!image) {
+      throw new Error("No camera frame available.");
+    }
+
+    const Tesseract = await loadOcr();
+    const result = await Tesseract.recognize(image, "eng");
+    const recognizedName = getLikelyCardName(result.data?.text ?? "");
+
+    if (!scanStream) {
+      return;
+    }
+
+    if (!recognizedName) {
+      statusText.textContent =
+        "I could not read the card name. Move closer, reduce glare, and scan again.";
+      scheduleLiveScanSearch();
+      return;
+    }
+
+    searchInput.value = recognizedName;
+    statusText.textContent = `Detected "${recognizedName}". Pulling matching cards...`;
+    await searchCards({ fromScan: true });
+  } catch (error) {
+    statusText.textContent =
+      "Automatic recognition failed. Try better lighting or use manual search.";
+    if (!String(error.message).includes("OCR library")) {
+      scheduleLiveScanSearch();
+    }
+  } finally {
+    isRecognizingCard = false;
   }
 }
 
@@ -239,8 +375,8 @@ function scheduleLiveScanSearch() {
   }
 
   scanSearchTimer = window.setTimeout(() => {
-    searchCards({ fromScan: true });
-  }, 450);
+    recognizeCardFromCamera();
+  }, 900);
 }
 
 async function startCardScan() {
@@ -263,9 +399,7 @@ async function startCardScan() {
     cardScanVideo.classList.add("is-live");
     await cardScanVideo.play();
     cardScanButton.textContent = "Stop scan";
-    statusText.textContent = getSearchQuery()
-      ? "Hold the card in frame. Matching results will slide up."
-      : "Type a card name above first, then scan to pull matching results.";
+    statusText.textContent = "Hold the card steady. I will read the card name and pull matches.";
     scheduleLiveScanSearch();
   } catch (error) {
     stopCardScan();
