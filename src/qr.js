@@ -72,6 +72,17 @@ function buildInternalCode(card, variant, condition, language) {
   ].join(":");
 }
 
+function buildDetailsUrl(cardRecord) {
+  const detailsUrl = new URL("./details.html", window.location.href);
+  detailsUrl.searchParams.set("card", cardRecord.code);
+  detailsUrl.searchParams.set("name", cardRecord.displayName);
+  detailsUrl.searchParams.set("grade", cardRecord.grade);
+  detailsUrl.searchParams.set("meta", cardRecord.heroMeta);
+  detailsUrl.searchParams.set("price", cardRecord.marketPrice);
+  detailsUrl.searchParams.set("range", cardRecord.marketRange);
+  return detailsUrl.toString();
+}
+
 function getDisplayPrice(card) {
   const prices = card.tcgplayer?.prices ?? {};
   const priceGroups = Object.values(prices);
@@ -251,7 +262,7 @@ function saveSelectedCardRecord() {
   const pricingQuery = buildPricingQuery(selectedCard, variant, condition, language);
   const title = `${selectedCard.name} ${variant}`;
 
-  saveCreatedCard({
+  const cardRecord = {
     code,
     displayName: selectedCard.name,
     grade: condition,
@@ -280,9 +291,14 @@ function saveSelectedCardRecord() {
     excludeTerms: condition.startsWith("Raw")
       ? "PSA BGS CGC Japanese damaged world championship"
       : "raw damaged world championship",
-  });
+  };
 
-  return { code, variant, condition, language };
+  return {
+    cardRecord: saveCreatedCard(cardRecord),
+    variant,
+    condition,
+    language,
+  };
 }
 
 function renderQrRecord(record, label) {
@@ -304,15 +320,15 @@ function generateQrCode() {
     return;
   }
 
-  const { code, variant, condition } = saveSelectedCardRecord();
+  const { cardRecord, variant, condition } = saveSelectedCardRecord();
   const record = saveQrCode({
-    code,
-    mode: "code",
-    payload: code,
+    code: cardRecord.code,
+    mode: "link",
+    payload: buildDetailsUrl(cardRecord),
   });
 
   renderQrRecord(record, `${selectedCard.name} · ${variant} · ${condition}`);
-  statusText.textContent = "QR code generated and card info stored in the local demo database.";
+  statusText.textContent = "QR code generated as a direct card link and card info stored in the local demo database.";
 }
 
 function applyUrlParams() {
@@ -326,8 +342,15 @@ function applyUrlParams() {
   const normalized = extractSleeveCode(code);
   const record = saveQrCode({
     code: normalized,
-    mode: "code",
-    payload: normalized,
+    mode: "link",
+    payload: buildDetailsUrl({
+      code: normalized,
+      displayName: normalized,
+      grade: "Saved QR",
+      heroMeta: "Saved sleeve code",
+      marketPrice: "--",
+      marketRange: "Open this QR from a generated card record for full details.",
+    }),
   });
   renderQrRecord(record, normalized);
   statusText.textContent = "Saved QR loaded. You can print it again or search for another card.";

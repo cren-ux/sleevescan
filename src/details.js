@@ -18,6 +18,32 @@ function getRequestedCard() {
   return params.get("card") ?? "raw:charizard-base-4";
 }
 
+function getFallbackCardFromParams() {
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get("name");
+
+  if (!name) {
+    return null;
+  }
+
+  return {
+    displayName: name,
+    grade: params.get("grade") ?? "Review",
+    heroMeta: params.get("meta") ?? "Seller-created card record",
+    icon: "CARD",
+    marketPrice: params.get("price") ?? "--",
+    marketRange:
+      params.get("range") ??
+      "Seller-created QR code. Live comps will connect once the shared database is online.",
+    trend24h: "Pending comps",
+    low30d: "--",
+    high30d: "--",
+    chartLabels: ["Now"],
+    chartValues: [1],
+    comps: [],
+  };
+}
+
 function createTrendPath(values) {
   const width = 680;
   const height = 220;
@@ -112,4 +138,6 @@ function renderCard(card) {
   renderComps(card.comps);
 }
 
-renderCard(await getPricingCardByCode(getRequestedCard()));
+const requestedCard = getRequestedCard();
+const pricingCard = await getPricingCardByCode(requestedCard);
+renderCard(pricingCard ?? getFallbackCardFromParams());

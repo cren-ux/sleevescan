@@ -31,6 +31,17 @@ function navigateToDetails(code) {
 
   activeCode = normalized;
   codeInput.value = normalized;
+
+  try {
+    const scannedUrl = new URL(code.trim());
+    if (scannedUrl.searchParams.has("card")) {
+      window.location.href = scannedUrl.toString();
+      return;
+    }
+  } catch (error) {
+    // Plain sleeve IDs are handled by the local details route below.
+  }
+
   window.location.href = `./details.html?card=${encodeURIComponent(normalized)}`;
 }
 
