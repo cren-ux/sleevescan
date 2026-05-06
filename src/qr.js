@@ -32,6 +32,7 @@ let scanSearchTimer = null;
 let ocrPromise = null;
 let isRecognizingCard = false;
 let lastDetectedType = "";
+let lastScanSignature = null;
 
 const OCR_SCRIPT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
 const OCR_STOPWORDS = new Set([
@@ -247,8 +248,61 @@ function captureCardFrame() {
 
   return {
     detectedType,
+    signature: getImageSignature(fullCanvas),
     image: nameCanvas.toDataURL("image/png"),
   };
+}
+
+function getImageSignature(canvas) {
+  const signatureCanvas = document.createElement("canvas");
+  const cells = 6;
+  signatureCanvas.width = cells;
+  signatureCanvas.height = cells;
+  const context = signatureCanvas.getContext("2d", { willReadFrequently: true });
+  context.drawImage(canvas, 0, 0, cells, cells);
+  const imageData = context.getImageData(0, 0, cells, cells).data;
+  const signature = [];
+
+  for (let index = 0; index < imageData.length; index += 4) {
+    signature.push(imageData[index], imageData[index + 1], imageData[index + 2]);
+  }
+
+  return signature;
+}
+
+function compareSignatures(first, second) {
+  if (!first || !second || first.length !== second.length) {
+    return 0;
+  }
+
+  let distance = 0;
+
+  for (let index = 0; index < first.length; index += 1) {
+    distance += Math.abs(first[index] - second[index]);
+  }
+
+  return 1 - Math.min(distance / (first.length * 255), 1);
+}
+
+function loadImageSignature(url) {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 180;
+        canvas.height = 252;
+        const context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(getImageSignature(canvas));
+      } catch (error) {
+        resolve(null);
+      }
+    };
+    image.onerror = () => resolve(null);
+    image.src = url;
+  });
 }
 
 function detectCardTypeFromCanvas(canvas) {
@@ -340,7 +394,7 @@ async function searchCards({ fromScan = false, detectedType = lastDetectedType }
 
   try {
     const cards = await fetchCatalogCards(primaryName, detectedType);
-    renderResults(cards, query, fromScan, detectedType);
+    await renderResults(cards, query, fromScan, detectedType);
   } catch (error) {
     statusText.textContent = "Catalog search failed. Check your internet connection and try again.";
   }
@@ -390,6 +444,7 @@ async function recognizeCardFromCamera() {
     }
 
     lastDetectedType = scanFrame.detectedType;
+    lastScanSignature = scanFrame.signature;
     const Tesseract = await loadOcr();
     const result = await Tesseract.recognize(scanFrame.image, "eng");
     const recognizedName = getLikelyCardName(result.data?.text ?? "");
@@ -399,8 +454,16 @@ async function recognizeCardFromCamera() {
     }
 
     if (!recognizedName) {
+      if (lastDetectedType) {
+        statusText.textContent = `Could not read text, so I am matching by ${getTypeLabel(
+          lastDetectedType
+        )} image similarity...`;
+        await searchByVisualType(lastDetectedType);
+        return;
+      }
+
       statusText.textContent =
-        "I could not read the card name. Move closer, reduce glare, and scan again.";
+        "I could not read the card name or type. Move closer, reduce glare, and scan again.";
       scheduleLiveScanSearch();
       return;
     }
@@ -421,9 +484,43 @@ async function recognizeCardFromCamera() {
   }
 }
 
-function renderResults(cards, query, fromScan, detectedType = "") {
+async function searchByVisualType(detectedType) {
+  catalogResults.innerHTML = "";
+  catalogResultsShell.hidden = false;
+  catalogResultsShell.classList.add("catalog-results-shell--popup");
+  clearCardSelection();
+
+  try {
+    const cards = await fetchCatalogQuery(`types:${detectedType}`);
+    await renderResults(cards, "", true, detectedType);
+  } catch (error) {
+    statusText.textContent = "Image matching failed. Try again with the card closer to the camera.";
+  }
+}
+
+async function scoreVisualMatches(scoredCards) {
+  if (!lastScanSignature) {
+    return scoredCards;
+  }
+
+  const scoredWithVisuals = await Promise.all(
+    scoredCards.map(async (item) => {
+      const signature = await loadImageSignature(item.card.images?.small ?? "");
+      const visualScore = compareSignatures(lastScanSignature, signature);
+      return {
+        ...item,
+        visualScore,
+        score: item.score + visualScore * 6,
+      };
+    })
+  );
+
+  return scoredWithVisuals.sort((a, b) => b.score - a.score);
+}
+
+async function renderResults(cards, query, fromScan, detectedType = "") {
   const queryTerms = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const scoredCards = cards
+  const scoredCards = await scoreVisualMatches(cards
     .map((card) => {
       const typeMatch = detectedType && card.types?.includes(detectedType);
       const haystack = `${card.name} ${card.set.name} ${card.number} ${card.rarity ?? ""} ${
@@ -433,16 +530,18 @@ function renderResults(cards, query, fromScan, detectedType = "") {
       const score = textScore + (typeMatch ? 4 : 0);
       return { card, score };
     })
-    .sort((a, b) => b.score - a.score)
-    .map((item) => item.card);
+    .sort((a, b) => b.score - a.score));
+  const rankedCards = scoredCards.map((item) => item.card);
 
-  statusText.textContent = scoredCards.length
+  statusText.textContent = rankedCards.length
     ? fromScan
-      ? `Live matches found${detectedType ? `, filtered toward ${getTypeLabel(detectedType)}` : ""}. Pick the exact card.`
+      ? `Image-ranked matches found${
+          detectedType ? `, filtered toward ${getTypeLabel(detectedType)}` : ""
+        }. Pick the exact card.`
       : "Pick the exact card from the catalog."
     : "No catalog matches found. Try fewer words.";
 
-  scoredCards.forEach((card) => {
+  rankedCards.forEach((card) => {
     const button = document.createElement("button");
     const image = document.createElement("img");
     const content = document.createElement("span");
@@ -641,6 +740,7 @@ function applyUrlParams() {
 
 searchButton.addEventListener("click", () => {
   lastDetectedType = "";
+  lastScanSignature = null;
   searchCards();
 });
 
@@ -648,6 +748,7 @@ searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
     lastDetectedType = "";
+    lastScanSignature = null;
     searchCards();
   }
 });
@@ -657,6 +758,7 @@ searchInput.addEventListener("input", () => {
   hideResultsSheet();
   clearCardSelection();
   lastDetectedType = "";
+  lastScanSignature = null;
   statusText.textContent = "Search updated. Tap Search or Scan card for fresh matches.";
   scheduleLiveScanSearch();
 });
