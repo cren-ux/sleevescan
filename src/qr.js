@@ -99,8 +99,25 @@ function getDisplayPrice(card) {
 }
 
 function getSearchQuery() {
-  const query = searchInput.value.trim();
-  return query || "umbreon";
+  return searchInput.value.trim();
+}
+
+function hideResultsSheet() {
+  catalogResultsShell.hidden = true;
+  catalogResultsShell.classList.remove("catalog-results-shell--popup");
+}
+
+function resetGeneratedQr() {
+  activeRecord = null;
+  qrOutputPanel.hidden = true;
+  qrPreview.hidden = true;
+  printQrButton.hidden = true;
+}
+
+function clearCardSelection() {
+  selectedCard = null;
+  selectedCardPanel.hidden = true;
+  resetGeneratedQr();
 }
 
 async function searchCards({ fromScan = false } = {}) {
@@ -108,17 +125,20 @@ async function searchCards({ fromScan = false } = {}) {
   const primaryName = getPrimaryName(query);
 
   if (!primaryName) {
-    statusText.textContent = "Type a card name to search.";
+    catalogResults.innerHTML = "";
+    hideResultsSheet();
+    clearCardSelection();
+    statusText.textContent =
+      fromScan
+        ? "Type a card name above first, then scan to pull matching card results."
+        : "Type a card name to search.";
     return;
   }
 
   catalogResults.innerHTML = "";
   catalogResultsShell.hidden = false;
   catalogResultsShell.classList.toggle("catalog-results-shell--popup", fromScan);
-  selectedCardPanel.hidden = true;
-  qrOutputPanel.hidden = true;
-  qrPreview.hidden = true;
-  printQrButton.hidden = true;
+  clearCardSelection();
   statusText.textContent = fromScan
     ? "Scanning catalog matches..."
     : "Searching Pokemon TCG catalog...";
@@ -182,16 +202,13 @@ function renderResults(cards, query, fromScan) {
 
 function selectCard(card) {
   selectedCard = card;
-  activeRecord = null;
   stopCardScan();
-  catalogResultsShell.classList.remove("catalog-results-shell--popup");
+  hideResultsSheet();
   selectedCardImage.src = card.images?.small ?? "";
   selectedCardName.textContent = card.name;
   selectedCardMeta.textContent = `${card.set.name} · ${card.number} · ${card.rarity ?? "Unknown rarity"}`;
   selectedCardPanel.hidden = false;
-  qrOutputPanel.hidden = true;
-  qrPreview.hidden = true;
-  printQrButton.hidden = true;
+  resetGeneratedQr();
   statusText.textContent = "Card selected. Confirm the variant and condition, then generate the QR code.";
   selectedCardPanel.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -246,7 +263,9 @@ async function startCardScan() {
     cardScanVideo.classList.add("is-live");
     await cardScanVideo.play();
     cardScanButton.textContent = "Stop scan";
-    statusText.textContent = "Hold the card in frame. Matching results will appear below.";
+    statusText.textContent = getSearchQuery()
+      ? "Hold the card in frame. Matching results will slide up."
+      : "Type a card name above first, then scan to pull matching results.";
     scheduleLiveScanSearch();
   } catch (error) {
     stopCardScan();
@@ -368,6 +387,10 @@ searchInput.addEventListener("keydown", (event) => {
 });
 
 searchInput.addEventListener("input", () => {
+  catalogResults.innerHTML = "";
+  hideResultsSheet();
+  clearCardSelection();
+  statusText.textContent = "Search updated. Tap Search or Scan card for fresh matches.";
   scheduleLiveScanSearch();
 });
 
@@ -382,8 +405,7 @@ printQrButton.addEventListener("click", () => {
 });
 
 closeResultsButton.addEventListener("click", () => {
-  catalogResultsShell.hidden = true;
-  catalogResultsShell.classList.remove("catalog-results-shell--popup");
+  hideResultsSheet();
 });
 
 window.addEventListener("beforeunload", () => {
